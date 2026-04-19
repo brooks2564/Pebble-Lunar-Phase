@@ -1,4 +1,4 @@
-# Lunar Phase
+# Lunar Phase 🌙
 
 A Pebble watchface that tracks the moon.
 
