@@ -1,5 +1,6 @@
 import Poco from "commodetto/Poco";
 import Message from "pebble/message";
+import Accelerometer from "embedded:sensor/Accelerometer";
 
 const render = new Poco(screen);
 const W = render.width;
@@ -14,14 +15,101 @@ const dgray   = render.makeColor(60, 60, 60);
 const moonBg  = render.makeColor(26, 26, 46);
 const moonFg  = render.makeColor(255, 253, 220);
 
+// Star colors (3 brightness levels)
+const sBright = render.makeColor(255, 255, 255);
+const sMed    = render.makeColor(190, 190, 210);
+const sDim    = render.makeColor(110, 110, 140);
+
+// Shooting star colors
+const ssHead  = render.makeColor(255, 255, 255);
+const ssMid   = render.makeColor(160, 160, 180);
+const ssTail  = render.makeColor(70, 70, 90);
+
 const fTime  = new render.Font(isRound ? "Bitham-Black" : "Bitham-Bold", isRound ? 30 : 42);
 const fDate  = new render.Font("Gothic-Regular", 18);
 const fPhase = new render.Font("Gothic-Bold", 18);
 const fSm    = new render.Font("Gothic-Regular", 14);
 
-let weather = { temp: null, code: -1, rise: -1, set: -1 };
+const moonCX = W >> 1;
+const moonCY = isRound ? 92 : 122;
+const moonR  = isRound ? 45 : 48;
 
-// onReadable must be at top level — nested inside "input" is wrong for this API
+// ── Stars (pseudo-random, fixed seed, avoid moon + text areas) ──────────────
+function generateStars() {
+    let seed = 0xABCD1234;
+    function rand() {
+        seed = ((seed * 1664525) + 1013904223) >>> 0;
+        return seed / 0xFFFFFFFF;
+    }
+
+    const minY    = isRound ? 44 : 72;
+    const maxY    = isRound ? 152 : 168;
+    const excludeR = moonR + 12;
+    const out = [];
+    let tries = 0;
+
+    while (out.length < 14 && tries < 400) {
+        tries++;
+        const x = (rand() * (W - 4) + 2) | 0;
+        const y = (rand() * (H - 4) + 2) | 0;
+        if (y < minY || y > maxY) continue;
+        const dx = x - moonCX, dy = y - moonCY;
+        if (dx*dx + dy*dy < excludeR*excludeR) continue;
+
+        const rv = rand();
+        const size  = rv < 0.65 ? 1 : rv < 0.90 ? 2 : 3;
+        const bv    = rand();
+        const color = bv < 0.45 ? sBright : bv < 0.75 ? sMed : sDim;
+        out.push({x, y, size, color});
+    }
+    return out;
+}
+
+const stars = generateStars();
+
+// ── Shooting star ──────────────────────────────────────────────────────────
+const SS_DX = 7, SS_DY = 2;
+const SS_NORM = Math.sqrt(SS_DX*SS_DX + SS_DY*SS_DY);
+const SS_UX = SS_DX / SS_NORM;
+const SS_UY = SS_DY / SS_NORM;
+
+// Pre-computed tail segments: [{dist, size, color}]
+const SS_SEGMENTS = [
+    {dist:  0, sz: 2, color: ssHead},
+    {dist:  5, sz: 2, color: ssHead},
+    {dist:  9, sz: 2, color: ssMid },
+    {dist: 14, sz: 1, color: ssMid },
+    {dist: 18, sz: 1, color: ssTail},
+    {dist: 22, sz: 1, color: ssTail},
+];
+
+let ssActive = false, ssX = 0, ssY = 0, ssTimer = null;
+
+function startShootingStar() {
+    if (ssActive) return;
+    ssActive = true;
+    ssX = -28;
+    ssY = ((H * 0.18) + Math.random() * H * 0.5) | 0;
+    if (ssTimer) { clearInterval(ssTimer); ssTimer = null; }
+    ssTimer = setInterval(() => {
+        ssX += SS_DX;
+        ssY += SS_DY;
+        if (ssX > W + 30) {
+            clearInterval(ssTimer);
+            ssTimer = null;
+            ssActive = false;
+        }
+        draw();
+    }, 45);
+}
+
+// ── Accelerometer — wrist flick triggers shooting star ─────────────────────
+const accel = new Accelerometer({
+    onTap() { startShootingStar(); }
+});
+
+// ── Weather ────────────────────────────────────────────────────────────────
+let weather = { temp: null, code: -1, rise: -1, set: -1 };
 let msg;
 msg = new Message({
     keys: ["TEMP", "CODE", "RISE", "SET"],
@@ -35,6 +123,7 @@ msg = new Message({
     }
 });
 
+// ── Helpers ────────────────────────────────────────────────────────────────
 function getMoonPhase(date) {
     const ref   = new Date(Date.UTC(2000, 0, 6, 18, 14, 0));
     const cycle = 29.53058867;
@@ -78,12 +167,20 @@ function cx(text, font) {
     return (W - render.getTextWidth(text, font)) >> 1;
 }
 
-function drawMoon(mcx, mcy, r, phase) {
-    for (let dy = -r; dy <= r; dy++) {
-        const chord = Math.sqrt(r * r - dy * dy) | 0;
+// ── Drawing ────────────────────────────────────────────────────────────────
+function drawStars() {
+    for (let i = 0; i < stars.length; i++) {
+        const s = stars[i];
+        render.fillRectangle(s.color, s.x, s.y, s.size, s.size);
+    }
+}
+
+function drawMoon(phase) {
+    for (let dy = -moonR; dy <= moonR; dy++) {
+        const chord = Math.sqrt(moonR * moonR - dy * dy) | 0;
         if (chord <= 0) continue;
-        const y = mcy + dy;
-        render.fillRectangle(moonBg, mcx - chord, y, chord * 2, 1);
+        const y = moonCY + dy;
+        render.fillRectangle(moonBg, moonCX - chord, y, chord * 2, 1);
         let x1, x2;
         if (phase < 0.5) {
             const tx = (Math.cos(phase * Math.PI * 2) * chord) | 0;
@@ -93,12 +190,23 @@ function drawMoon(mcx, mcy, r, phase) {
             x1 = -chord; x2 = tx;
         }
         if (x2 > x1) {
-            const lx = mcx + x1;
-            const pw = mcx + x2 - lx;
+            const lx = moonCX + x1;
+            const pw = moonCX + x2 - lx;
             if (pw > 0) render.fillRectangle(moonFg, lx, y, pw, 1);
         }
     }
-    render.drawCircle(dgray, mcx, mcy, r, 0, 65536);
+    render.drawCircle(dgray, moonCX, moonCY, moonR, 0, 65536);
+}
+
+function drawShootingStar() {
+    if (!ssActive) return;
+    for (let i = 0; i < SS_SEGMENTS.length; i++) {
+        const seg = SS_SEGMENTS[i];
+        const px = (ssX - SS_UX * seg.dist) | 0;
+        const py = (ssY - SS_UY * seg.dist) | 0;
+        if (px < 0 || px >= W || py < 0 || py >= H) continue;
+        render.fillRectangle(seg.color, px, py, seg.sz, seg.sz);
+    }
 }
 
 function draw() {
@@ -116,10 +224,12 @@ function draw() {
     render.begin();
     render.fillRectangle(black, 0, 0, W, H);
 
+    drawStars();
+
     if (isRound) {
         // ── Gabbro 180×180 ──────────────────────────────────────────────────
         render.drawText(timeStr, fTime, white, cx(timeStr, fTime), 4);
-        drawMoon(W >> 1, 92, 45, phase);
+        drawMoon(phase);
         render.drawText(pname, fPhase, lgray, cx(pname, fPhase), 142);
         if (weather.temp !== null) {
             const wStr = weather.temp + "\u00b0F" + (weather.code > 0 ? "  " + getCondition(weather.code) : "");
@@ -130,7 +240,7 @@ function draw() {
         render.drawText(timeStr, fTime, white, cx(timeStr, fTime), 2);
         render.drawText(dateStr, fDate, gray, cx(dateStr, fDate), 48);
         render.drawLine(20, 70, W - 20, 70, dgray, 1);
-        drawMoon(W >> 1, 122, 48, phase);
+        drawMoon(phase);
         render.drawText(pname, fPhase, lgray, cx(pname, fPhase), 174);
         if (weather.temp !== null) {
             const cond = getCondition(weather.code);
@@ -144,6 +254,8 @@ function draw() {
             render.drawText(sStr, fSm, dgray, W - render.getTextWidth(sStr, fSm) - 6, 212);
         }
     }
+
+    drawShootingStar();
 
     render.end();
 }
