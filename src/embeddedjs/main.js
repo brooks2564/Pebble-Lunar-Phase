@@ -250,8 +250,8 @@ function draw() {
         if (weather.rise >= 0 && weather.set >= 0) {
             const rStr = "Rise " + minsToTime12(weather.rise);
             const sStr = "Set " + minsToTime12(weather.set);
-            render.drawText(rStr, fSm, dgray, 6, 212);
-            render.drawText(sStr, fSm, dgray, W - render.getTextWidth(sStr, fSm) - 6, 212);
+            render.drawText(rStr, fSm, gray, 6, 208);
+            render.drawText(sStr, fSm, gray, W - render.getTextWidth(sStr, fSm) - 6, 208);
         }
     }
 
