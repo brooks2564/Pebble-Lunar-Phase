@@ -238,7 +238,7 @@ function draw() {
     } else {
         // ── Emery 200×228 ────────────────────────────────────────────────────
         render.drawText(timeStr, fTime, white, cx(timeStr, fTime), 2);
-        render.drawText(dateStr, fDate, gray, cx(dateStr, fDate), 51);
+        render.drawText(dateStr, fDate, gray, cx(dateStr, fDate), 46);
         render.drawLine(20, 78, W - 20, 78, dgray, 1);
         drawMoon(phase);
         render.drawText(pname, fPhase, lgray, cx(pname, fPhase), 174);
