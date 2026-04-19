@@ -1,0 +1,35 @@
+{
+    "displayName": "Pebble-Lunar-Phase",
+    "uuid": "075fc4d5-ca1a-4c9f-a91e-078a2fdf3ad1",
+    "projectType": "moddable",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+        "emery",
+        "gabbro"
+    ],
+    "watchapp": {
+        "watchface": true
+    },
+    "messageKeys": {
+        "TEMP": 10000,
+        "CODE": 10001,
+        "RISE": 10002,
+        "SET": 10003
+    },
+    "resources": {
+        "media": []
+    },
+    "name": "Pebble-Lunar-Phase",
+    "shortName": "Pebble-Lunar-Phase",
+    "longName": "Pebble-Lunar-Phase",
+    "versionLabel": "1.0",
+    "companyName": "Brooman Inks",
+    "appKeys": {
+        "TEMP": 10000,
+        "CODE": 10001,
+        "RISE": 10002,
+        "SET": 10003
+    },
+    "capabilities": []
+}

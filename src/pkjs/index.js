@@ -1,16 +1,17 @@
-// Message key indices (watch maps keys to 10000 + index)
-var KEY_TEMP = 10000;  // temperature in Fahrenheit (integer)
-var KEY_CODE = 10001;  // WMO weather code (integer)
-var KEY_RISE = 10002;  // sunrise minutes from midnight (integer)
-var KEY_SET  = 10003;  // sunset minutes from midnight (integer)
+var moddableProxy = require("@moddable/pebbleproxy");
 
 Pebble.addEventListener("ready", function() {
-    console.log("Lunar Phase phone side ready");
+    console.log("Lunar Phase ready");
+    moddableProxy.readyReceived();
     sendWeatherData();
+    setInterval(sendWeatherData, 30 * 60 * 1000);
+});
+
+Pebble.addEventListener("appmessage", function(e) {
+    moddableProxy.appMessageReceived(e);
 });
 
 function timeStrToMins(str) {
-    // Parse "HH:MM" from end of ISO timestamp like "2026-04-18T06:30"
     var t = str.slice(-5).split(":");
     return parseInt(t[0]) * 60 + parseInt(t[1]);
 }
@@ -30,38 +31,32 @@ function sendWeatherData() {
                 "&timezone=auto" +
                 "&forecast_days=1";
 
-            fetch(url)
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    var temp  = Math.round(data.current.temperature_2m);
-                    var code  = data.current.weathercode;
-                    var rise  = -1;
-                    var set   = -1;
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url);
+            xhr.onload = function() {
+                if (xhr.status !== 200) return;
+                try {
+                    var data = JSON.parse(xhr.responseText);
+                    var temp = Math.round(data.current.temperature_2m);
+                    var code = data.current.weathercode || 0;
+                    var rise = -1, set = -1;
                     try {
                         rise = timeStrToMins(data.daily.sunrise[0]);
                         set  = timeStrToMins(data.daily.sunset[0]);
-                    } catch(e) {
-                        console.log("Sunrise/sunset parse error: " + e);
-                    }
-
-                    var payload = {};
-                    payload[KEY_TEMP] = temp;
-                    payload[KEY_CODE] = code;
-                    payload[KEY_RISE] = rise;
-                    payload[KEY_SET]  = set;
-
-                    Pebble.sendAppMessage(payload,
-                        function() { console.log("Weather sent OK"); },
-                        function(e) { console.log("Weather send failed: " + JSON.stringify(e)); }
-                    );
-                })
-                .catch(function(e) {
-                    console.log("Weather fetch failed: " + e);
-                });
+                    } catch(e) {}
+                    console.log("Weather: " + temp + "F code=" + code);
+                    moddableProxy.sendAppMessage({
+                        'TEMP': temp,
+                        'CODE': code,
+                        'RISE': rise,
+                        'SET': set
+                    });
+                } catch(e) { console.log("Parse: " + e); }
+            };
+            xhr.onerror = function() { console.log("XHR error"); };
+            xhr.send();
         },
-        function(err) {
-            console.log("Geolocation error: " + err.message);
-        },
-        { timeout: 15000 }
+        function(err) { console.log("Geo: " + err.code); },
+        { timeout: 15000, maximumAge: 60000 }
     );
 }
