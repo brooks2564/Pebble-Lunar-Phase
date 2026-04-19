@@ -34,9 +34,17 @@ const moonCX = W >> 1;
 const moonCY = isRound ? 92 : 122;
 const moonR  = isRound ? 45 : 48;
 
-// ── Stars (pseudo-random, fixed seed, avoid moon + text areas) ──────────────
+// ── Stars (daily seed, changes at 4 AM) ────────────────────────────────────
+function getStarDay() {
+    const now = new Date();
+    // Before 4 AM counts as the previous calendar day
+    const d = now.getHours() < 4 ? new Date(now.getTime() - 4 * 3600000) : now;
+    return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+}
+
 function generateStars() {
-    let seed = 0xABCD1234;
+    let seed = (getStarDay() * 2654435761) >>> 0;
+    if (seed === 0) seed = 1;
     function rand() {
         seed = ((seed * 1664525) + 1013904223) >>> 0;
         return seed / 0xFFFFFFFF;
@@ -62,7 +70,8 @@ function generateStars() {
     return out;
 }
 
-const stars = generateStars();
+let stars = generateStars();
+let currentStarDay = getStarDay();
 
 // ── Shooting star ──────────────────────────────────────────────────────────
 const SS_DX = 7, SS_DY = 2;
@@ -257,5 +266,12 @@ function draw() {
     render.end();
 }
 
-watch.addEventListener("minutechange", draw);
+watch.addEventListener("minutechange", () => {
+    const day = getStarDay();
+    if (day !== currentStarDay) {
+        currentStarDay = day;
+        stars = generateStars();
+    }
+    draw();
+});
 draw();
