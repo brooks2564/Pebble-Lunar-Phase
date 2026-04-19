@@ -4,9 +4,7 @@
   "version": "1.0.0",
   "keywords": ["pebble-app"],
   "private": true,
-  "dependencies": {
-    "@moddable/pebbleproxy": "file:/home/brooks2564/.pebble-sdk/SDKs/4.9.148/toolchain/moddable/build/devices/pebble/npm/pebbleproxy"
-  },
+  "dependencies": {},
   "pebble": {
     "displayName": "Pebble-Lunar-Phase",
     "uuid": "075fc4d5-ca1a-4c9f-a91e-078a2fdf3ad1",

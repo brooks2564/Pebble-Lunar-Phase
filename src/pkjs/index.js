@@ -1,4 +1,4 @@
-var moddableProxy = require("@moddable/pebbleproxy");
+var moddableProxy = require("./pebbleproxy");
 
 Pebble.addEventListener("ready", function() {
     console.log("Lunar Phase ready");
