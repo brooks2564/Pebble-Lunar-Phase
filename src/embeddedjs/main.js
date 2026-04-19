@@ -25,7 +25,7 @@ const ssHead  = render.makeColor(255, 255, 255);
 const ssMid   = render.makeColor(160, 160, 180);
 const ssTail  = render.makeColor(70, 70, 90);
 
-const fTime  = new render.Font(isRound ? "Bitham-Black" : "Bitham-Bold", isRound ? 30 : 42);
+const fTime  = new render.Font(isRound ? "Bitham-Black" : "Roboto-Bold", isRound ? 30 : 49);
 const fDate  = new render.Font("Gothic-Regular", 18);
 const fPhase = new render.Font("Gothic-Bold", 18);
 const fSm    = new render.Font("Gothic-Regular", 14);
@@ -238,8 +238,8 @@ function draw() {
     } else {
         // ── Emery 200×228 ────────────────────────────────────────────────────
         render.drawText(timeStr, fTime, white, cx(timeStr, fTime), 2);
-        render.drawText(dateStr, fDate, gray, cx(dateStr, fDate), 48);
-        render.drawLine(20, 70, W - 20, 70, dgray, 1);
+        render.drawText(dateStr, fDate, gray, cx(dateStr, fDate), 56);
+        render.drawLine(20, 78, W - 20, 78, dgray, 1);
         drawMoon(phase);
         render.drawText(pname, fPhase, lgray, cx(pname, fPhase), 174);
         if (weather.temp !== null) {
