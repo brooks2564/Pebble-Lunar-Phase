@@ -42,17 +42,14 @@ function generateStars() {
         return seed / 0xFFFFFFFF;
     }
 
-    const minY    = isRound ? 44 : 72;
-    const maxY    = isRound ? 152 : 168;
     const excludeR = moonR + 12;
     const out = [];
     let tries = 0;
 
-    while (out.length < 14 && tries < 400) {
+    while (out.length < 18 && tries < 600) {
         tries++;
         const x = (rand() * (W - 4) + 2) | 0;
         const y = (rand() * (H - 4) + 2) | 0;
-        if (y < minY || y > maxY) continue;
         const dx = x - moonCX, dy = y - moonCY;
         if (dx*dx + dy*dy < excludeR*excludeR) continue;
 
