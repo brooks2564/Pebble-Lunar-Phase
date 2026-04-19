@@ -134,13 +134,13 @@ function getMoonPhase(date) {
 
 function getPhaseName(phase) {
     if (phase < 0.0625 || phase >= 0.9375) return "New Moon";
-    if (phase < 0.1875) return "Wax. Crescent";
+    if (phase < 0.1875) return "Waxing Crescent";
     if (phase < 0.3125) return "First Quarter";
-    if (phase < 0.4375) return "Wax. Gibbous";
+    if (phase < 0.4375) return "Waxing Gibbous";
     if (phase < 0.5625) return "Full Moon";
-    if (phase < 0.6875) return "Wan. Gibbous";
+    if (phase < 0.6875) return "Waning Gibbous";
     if (phase < 0.8125) return "Last Quarter";
-    return "Wan. Crescent";
+    return "Waning Crescent";
 }
 
 function getCondition(code) {
