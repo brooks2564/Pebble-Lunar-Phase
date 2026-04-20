@@ -31,8 +31,8 @@ const fPhase = new render.Font("Gothic-Bold", 18);
 const fSm    = new render.Font("Gothic-Regular", 14);
 
 const moonCX = W >> 1;
-const moonCY = isRound ? 130 : 122;
-const moonR  = isRound ? 70 : 48;
+const moonCY = isRound ? 129 : 122;
+const moonR  = isRound ? 71 : 48;
 
 // ── Stars (daily seed, changes at 4 AM) ────────────────────────────────────
 function getStarDay() {
@@ -278,7 +278,7 @@ function draw() {
         // ── Gabbro 260×260 ──────────────────────────────────────────────────
         // Time and date at top
         render.drawText(timeStr, fTime, white, cx(timeStr, fTime), 6);
-        render.drawText(dateStr, fDate, gray, cx(dateStr, fDate), 40);
+        render.drawText(dateStr, fDate, gray, cx(dateStr, fDate), 38);
         drawMoon(phase);
         // Phase name, sun times, temp near bottom
         render.drawText(pname, fPhase, lgray, cx(pname, fPhase), 200);
