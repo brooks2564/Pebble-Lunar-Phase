@@ -282,7 +282,7 @@ function draw() {
         render.drawText(dateStr, fSm, gray, cx(dateStr, fSm), 30);
         drawMoon(phase);
         // Phase name, then sun times, then temp
-        render.drawText(pname, fPhase, lgray, cx(pname, fPhase), 152);
+        render.drawText(pname, fPhase, lgray, cx(pname, fPhase), 137);
         if (weather.rise >= 0 && weather.set >= 0) {
             const rStr = "UP " + minsToTime12(weather.rise);
             const sStr = "DN " + minsToTime12(weather.set);
@@ -290,12 +290,12 @@ function draw() {
             const rW = render.getTextWidth(rStr, fSm);
             const sW = render.getTextWidth(sStr, fSm);
             const rX = (W - rW - gap - sW) >> 1;
-            render.drawText(rStr, fSm, lgray, rX, 163);
-            render.drawText(sStr, fSm, lgray, rX + rW + gap, 163);
+            render.drawText(rStr, fSm, lgray, rX, 155);
+            render.drawText(sStr, fSm, lgray, rX + rW + gap, 155);
         }
         if (weather.temp !== null) {
             const wStr = weather.temp + "\u00b0F";
-            render.drawText(wStr, fSm, gray, cx(wStr, fSm), 172);
+            render.drawText(wStr, fSm, gray, cx(wStr, fSm), 169);
         }
     } else {
         // ── Emery 200×228 ────────────────────────────────────────────────────
