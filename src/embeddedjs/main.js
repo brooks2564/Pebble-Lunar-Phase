@@ -234,19 +234,18 @@ function draw() {
 
     if (isRound) {
         // ── Gabbro 180×180 ──────────────────────────────────────────────────
-        // Circle widths: y=139→~155px, y=155→~130px, y=164→~104px
         render.drawText(timeStr, fTime, white, cx(timeStr, fTime), 4);
         drawMoon(phase);
-        render.drawText(pname, fPhase, lgray, cx(pname, fPhase), 139);
+        render.drawText(pname, fPhase, lgray, cx(pname, fPhase), 155);
+        if (weather.temp !== null) {
+            const wStr = weather.temp + "\u00b0F" + (weather.code > 0 ? "  " + getCondition(weather.code) : "");
+            render.drawText(wStr, fSm, gray, cx(wStr, fSm), 165);
+        }
         if (weather.rise >= 0 && weather.set >= 0) {
             const rStr = "Sunrise " + minsToTime12(weather.rise);
             const sStr = "Sunset " + minsToTime12(weather.set);
-            render.drawText(rStr, fSm, gray, 4, 150);
-            render.drawText(sStr, fSm, gray, W - render.getTextWidth(sStr, fSm) - 4, 150);
-        }
-        if (weather.temp !== null) {
-            const wStr = weather.temp + "\u00b0F" + (weather.code > 0 ? "  " + getCondition(weather.code) : "");
-            render.drawText(wStr, fSm, gray, cx(wStr, fSm), 164);
+            render.drawText(rStr, fSm, gray, 4, 174);
+            render.drawText(sStr, fSm, gray, W - render.getTextWidth(sStr, fSm) - 4, 174);
         }
     } else {
         // ── Emery 200×228 ────────────────────────────────────────────────────
