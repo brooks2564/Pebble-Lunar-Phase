@@ -239,8 +239,8 @@ function draw() {
         drawMoon(phase);
         render.drawText(pname, fPhase, lgray, cx(pname, fPhase), 139);
         if (weather.rise >= 0 && weather.set >= 0) {
-            const rStr = "Rise " + minsToTime12(weather.rise);
-            const sStr = "Set " + minsToTime12(weather.set);
+            const rStr = "Sunrise " + minsToTime12(weather.rise);
+            const sStr = "Sunset " + minsToTime12(weather.set);
             render.drawText(rStr, fSm, gray, 4, 150);
             render.drawText(sStr, fSm, gray, W - render.getTextWidth(sStr, fSm) - 4, 150);
         }
@@ -261,8 +261,8 @@ function draw() {
             render.drawText(wStr, fSm, gray, cx(wStr, fSm), 194);
         }
         if (weather.rise >= 0 && weather.set >= 0) {
-            const rStr = "Rise " + minsToTime12(weather.rise);
-            const sStr = "Set " + minsToTime12(weather.set);
+            const rStr = "Sunrise " + minsToTime12(weather.rise);
+            const sStr = "Sunset " + minsToTime12(weather.set);
             render.drawText(rStr, fSm, gray, 6, 208);
             render.drawText(sStr, fSm, gray, W - render.getTextWidth(sStr, fSm) - 6, 208);
         }
