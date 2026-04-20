@@ -32,7 +32,7 @@ const fSm    = new render.Font("Gothic-Regular", 14);
 
 const moonCX = W >> 1;
 const moonCY = isRound ? 90 : 122;
-const moonR  = isRound ? 72 : 48;
+const moonR  = isRound ? 44 : 48;
 
 // ── Stars (daily seed, changes at 4 AM) ────────────────────────────────────
 function getStarDay() {
@@ -278,11 +278,11 @@ function draw() {
         // ── Gabbro 180×180 ──────────────────────────────────────────────────
         const PI = Math.PI;
         // Time and date at top
-        render.drawText(timeStr, fTime, white, cx(timeStr, fTime), 2);
-        render.drawText(dateStr, fSm, gray, cx(dateStr, fSm), 30);
+        render.drawText(timeStr, fTime, white, cx(timeStr, fTime), 4);
+        render.drawText(dateStr, fSm, gray, cx(dateStr, fSm), 31);
         drawMoon(phase);
         // Phase name, then sun times, then temp
-        render.drawText(pname, fPhase, lgray, cx(pname, fPhase), 137);
+        render.drawText(pname, fPhase, lgray, cx(pname, fPhase), 135);
         if (weather.rise >= 0 && weather.set >= 0) {
             const rStr = "UP " + minsToTime12(weather.rise);
             const sStr = "DN " + minsToTime12(weather.set);
@@ -290,12 +290,12 @@ function draw() {
             const rW = render.getTextWidth(rStr, fSm);
             const sW = render.getTextWidth(sStr, fSm);
             const rX = (W - rW - gap - sW) >> 1;
-            render.drawText(rStr, fSm, lgray, rX, 155);
-            render.drawText(sStr, fSm, lgray, rX + rW + gap, 155);
+            render.drawText(rStr, fSm, lgray, rX, 153);
+            render.drawText(sStr, fSm, lgray, rX + rW + gap, 153);
         }
         if (weather.temp !== null) {
             const wStr = weather.temp + "\u00b0F";
-            render.drawText(wStr, fSm, gray, cx(wStr, fSm), 169);
+            render.drawText(wStr, fSm, gray, cx(wStr, fSm), 167);
         }
     } else {
         // ── Emery 200×228 ────────────────────────────────────────────────────
