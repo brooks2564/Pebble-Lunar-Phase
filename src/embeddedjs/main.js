@@ -170,7 +170,7 @@ function minsToTime12(mins) {
     const h24 = Math.floor(mins / 60) % 24;
     const h12 = h24 % 12 || 12;
     const m   = mins % 60;
-    const ampm = h24 < 12 ? "a" : "p";
+    const ampm = h24 < 12 ? "am" : "pm";
     return h12 + ":" + (m < 10 ? "0" : "") + m + ampm;
 }
 
