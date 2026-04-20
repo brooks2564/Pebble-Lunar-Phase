@@ -32,7 +32,7 @@ const fSm    = new render.Font("Gothic-Regular", 14);
 
 const moonCX = W >> 1;
 const moonCY = isRound ? 90 : 122;
-const moonR  = isRound ? 42 : 48;
+const moonR  = isRound ? 44 : 48;
 
 // ── Stars (daily seed, changes at 4 AM) ────────────────────────────────────
 function getStarDay() {
@@ -50,16 +50,19 @@ function generateStars() {
         return seed / 0xFFFFFFFF;
     }
 
-    const excludeR = moonR + 12;
+    const excludeR = isRound ? 0 : moonR + 12;
+    const starCount = isRound ? 28 : 18;
     const out = [];
     let tries = 0;
 
-    while (out.length < 18 && tries < 600) {
+    while (out.length < starCount && tries < 800) {
         tries++;
         const x = (rand() * (W - 4) + 2) | 0;
         const y = (rand() * (H - 4) + 2) | 0;
-        const dx = x - moonCX, dy = y - moonCY;
-        if (dx*dx + dy*dy < excludeR*excludeR) continue;
+        if (excludeR > 0) {
+            const dx = x - moonCX, dy = y - moonCY;
+            if (dx*dx + dy*dy < excludeR*excludeR) continue;
+        }
 
         const rv = rand();
         const size  = rv < 0.65 ? 1 : rv < 0.90 ? 2 : 3;
@@ -279,7 +282,7 @@ function draw() {
         render.drawText(dateStr, fSm, gray, cx(dateStr, fSm), 31);
         drawMoon(phase);
         // Phase name, then sun times, then temp
-        render.drawText(pname, fPhase, lgray, cx(pname, fPhase), 133);
+        render.drawText(pname, fPhase, lgray, cx(pname, fPhase), 140);
         if (weather.rise >= 0 && weather.set >= 0) {
             const rStr = "UP " + minsToTime12(weather.rise);
             const sStr = "DN " + minsToTime12(weather.set);
@@ -287,12 +290,12 @@ function draw() {
             const rW = render.getTextWidth(rStr, fSm);
             const sW = render.getTextWidth(sStr, fSm);
             const rX = (W - rW - gap - sW) >> 1;
-            render.drawText(rStr, fSm, lgray, rX, 152);
-            render.drawText(sStr, fSm, lgray, rX + rW + gap, 152);
+            render.drawText(rStr, fSm, lgray, rX, 159);
+            render.drawText(sStr, fSm, lgray, rX + rW + gap, 159);
         }
         if (weather.temp !== null) {
             const wStr = weather.temp + "\u00b0F";
-            render.drawText(wStr, fSm, gray, cx(wStr, fSm), 165);
+            render.drawText(wStr, fSm, gray, cx(wStr, fSm), 171);
         }
     } else {
         // ── Emery 200×228 ────────────────────────────────────────────────────
