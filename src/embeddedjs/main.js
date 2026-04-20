@@ -31,8 +31,8 @@ const fPhase = new render.Font("Gothic-Bold", 18);
 const fSm    = new render.Font("Gothic-Regular", 14);
 
 const moonCX = W >> 1;
-const moonCY = isRound ? 92 : 122;
-const moonR  = isRound ? 45 : 48;
+const moonCY = isRound ? 90 : 122;
+const moonR  = isRound ? 42 : 48;
 
 // ── Stars (daily seed, changes at 4 AM) ────────────────────────────────────
 function getStarDay() {
@@ -174,6 +174,45 @@ function cx(text, font) {
 }
 
 // ── Drawing ────────────────────────────────────────────────────────────────
+function drawArcText(text, font, color, acx, acy, r, a0, a1, fontH) {
+    const widths = [];
+    let total = 0;
+    for (let i = 0; i < text.length; i++) {
+        const w = render.getTextWidth(text[i], font) | 0;
+        widths.push(w);
+        total += w;
+    }
+    if (total === 0) return;
+    const half = (fontH || 14) >> 1;
+    const span = a1 - a0;
+    let pos = 0;
+    for (let i = 0; i < text.length; i++) {
+        const frac = (pos + (widths[i] >> 1)) / total;
+        const a = a0 + frac * span;
+        const px = (acx + r * Math.cos(a)) | 0;
+        const py = (acy + r * Math.sin(a)) | 0;
+        render.drawText(text[i], font, color, px - (widths[i] >> 1), py - half);
+        pos += widths[i];
+    }
+}
+
+// Projects flat centered text onto the arc at radius r above acx,acy
+function drawArcTextCentered(text, font, color, acx, acy, r, fontH) {
+    const fullW = render.getTextWidth(text, font);
+    const half = (fontH || 14) >> 1;
+    let curX = acx - (fullW >> 1);
+    for (let i = 0; i < text.length; i++) {
+        const w = render.getTextWidth(text[i], font) | 0;
+        const charCX = curX + (w >> 1);
+        const dx = charCX - acx;
+        if (dx * dx < r * r) {
+            const py = (acy - Math.sqrt(r * r - dx * dx)) | 0;
+            render.drawText(text[i], font, color, charCX - (w >> 1), py - half);
+        }
+        curX += w;
+    }
+}
+
 function drawStars() {
     for (let i = 0; i < stars.length; i++) {
         const s = stars[i];
@@ -234,18 +273,26 @@ function draw() {
 
     if (isRound) {
         // ── Gabbro 180×180 ──────────────────────────────────────────────────
+        const PI = Math.PI;
+        // Time and date at top
         render.drawText(timeStr, fTime, white, cx(timeStr, fTime), 4);
+        render.drawText(dateStr, fSm, gray, cx(dateStr, fSm), 31);
         drawMoon(phase);
-        render.drawText(pname, fPhase, lgray, cx(pname, fPhase), 153);
-        if (weather.temp !== null) {
-            const wStr = weather.temp + "\u00b0F" + (weather.code > 0 ? "  " + getCondition(weather.code) : "");
-            render.drawText(wStr, fSm, gray, cx(wStr, fSm), 168);
-        }
+        // Phase name, then sun times, then temp
+        render.drawText(pname, fPhase, lgray, cx(pname, fPhase), 133);
         if (weather.rise >= 0 && weather.set >= 0) {
-            const rStr = "Sunrise " + minsToTime12(weather.rise);
-            const sStr = "Sunset " + minsToTime12(weather.set);
-            render.drawText(rStr, fSm, gray, 4, 177);
-            render.drawText(sStr, fSm, gray, W - render.getTextWidth(sStr, fSm) - 4, 177);
+            const rStr = "UP " + minsToTime12(weather.rise);
+            const sStr = "DN " + minsToTime12(weather.set);
+            const gap = 10;
+            const rW = render.getTextWidth(rStr, fSm);
+            const sW = render.getTextWidth(sStr, fSm);
+            const rX = (W - rW - gap - sW) >> 1;
+            render.drawText(rStr, fSm, lgray, rX, 152);
+            render.drawText(sStr, fSm, lgray, rX + rW + gap, 152);
+        }
+        if (weather.temp !== null) {
+            const wStr = weather.temp + "\u00b0F";
+            render.drawText(wStr, fSm, gray, cx(wStr, fSm), 165);
         }
     } else {
         // ── Emery 200×228 ────────────────────────────────────────────────────
