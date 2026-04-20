@@ -5,7 +5,7 @@ import Accelerometer from "embedded:sensor/Accelerometer";
 const render = new Poco(screen);
 const W = render.width;
 const H = render.height;
-const isRound = (W === H);   // gabbro 180x180; emery 200x228
+const isRound = (W === H);   // gabbro 260x260; emery 200x228
 
 const black   = render.makeColor(0, 0, 0);
 const white   = render.makeColor(255, 255, 255);
@@ -25,14 +25,14 @@ const ssHead  = render.makeColor(255, 255, 255);
 const ssMid   = render.makeColor(160, 160, 180);
 const ssTail  = render.makeColor(70, 70, 90);
 
-const fTime  = new render.Font(isRound ? "Bitham-Black" : "Roboto-Bold", isRound ? 30 : 49);
+const fTime  = new render.Font(isRound ? "Bitham-Black" : "Roboto-Bold", isRound ? 42 : 49);
 const fDate  = new render.Font("Gothic-Regular", 18);
 const fPhase = new render.Font("Gothic-Bold", 18);
 const fSm    = new render.Font("Gothic-Regular", 14);
 
 const moonCX = W >> 1;
-const moonCY = isRound ? 90 : 122;
-const moonR  = isRound ? 44 : 48;
+const moonCY = isRound ? 135 : 122;
+const moonR  = isRound ? 65 : 48;
 
 // ── Stars (daily seed, changes at 4 AM) ────────────────────────────────────
 function getStarDay() {
@@ -51,7 +51,7 @@ function generateStars() {
     }
 
     const excludeR = isRound ? 0 : moonR + 12;
-    const starCount = isRound ? 28 : 18;
+    const starCount = isRound ? 45 : 18;
     const out = [];
     let tries = 0;
 
@@ -275,27 +275,26 @@ function draw() {
     drawStars();
 
     if (isRound) {
-        // ── Gabbro 180×180 ──────────────────────────────────────────────────
-        const PI = Math.PI;
+        // ── Gabbro 260×260 ──────────────────────────────────────────────────
         // Time and date at top
-        render.drawText(timeStr, fTime, white, cx(timeStr, fTime), 4);
-        render.drawText(dateStr, fSm, gray, cx(dateStr, fSm), 31);
+        render.drawText(timeStr, fTime, white, cx(timeStr, fTime), 6);
+        render.drawText(dateStr, fDate, gray, cx(dateStr, fDate), 52);
         drawMoon(phase);
-        // Phase name, then sun times, then temp
-        render.drawText(pname, fPhase, lgray, cx(pname, fPhase), 155);
+        // Phase name, sun times, temp near bottom
+        render.drawText(pname, fPhase, lgray, cx(pname, fPhase), 200);
         if (weather.rise >= 0 && weather.set >= 0) {
             const rStr = "UP " + minsToTime12(weather.rise);
             const sStr = "DN " + minsToTime12(weather.set);
-            const gap = 10;
+            const gap = 14;
             const rW = render.getTextWidth(rStr, fSm);
             const sW = render.getTextWidth(sStr, fSm);
             const rX = (W - rW - gap - sW) >> 1;
-            render.drawText(rStr, fSm, lgray, rX, 170);
-            render.drawText(sStr, fSm, lgray, rX + rW + gap, 170);
+            render.drawText(rStr, fSm, lgray, rX, 220);
+            render.drawText(sStr, fSm, lgray, rX + rW + gap, 220);
         }
         if (weather.temp !== null) {
             const wStr = weather.temp + "\u00b0F";
-            render.drawText(wStr, fSm, gray, cx(wStr, fSm), 183);
+            render.drawText(wStr, fSm, gray, cx(wStr, fSm), 238);
         }
     } else {
         // ── Emery 200×228 ────────────────────────────────────────────────────
