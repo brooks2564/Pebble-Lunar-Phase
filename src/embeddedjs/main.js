@@ -167,9 +167,11 @@ function getCondition(code) {
 
 function minsToTime12(mins) {
     if (mins < 0) return "--:--";
-    const h12 = Math.floor(mins / 60) % 12 || 12;
+    const h24 = Math.floor(mins / 60) % 24;
+    const h12 = h24 % 12 || 12;
     const m   = mins % 60;
-    return h12 + ":" + (m < 10 ? "0" : "") + m;
+    const ampm = h24 < 12 ? "a" : "p";
+    return h12 + ":" + (m < 10 ? "0" : "") + m + ampm;
 }
 
 function cx(text, font) {
