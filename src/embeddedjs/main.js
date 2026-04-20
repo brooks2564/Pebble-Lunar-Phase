@@ -25,7 +25,7 @@ const ssHead  = render.makeColor(255, 255, 255);
 const ssMid   = render.makeColor(160, 160, 180);
 const ssTail  = render.makeColor(70, 70, 90);
 
-const fTime  = new render.Font(isRound ? "Bitham-Black" : "Roboto-Bold", isRound ? 30 : 49);
+const fTime  = new render.Font(isRound ? "Bitham-Black" : "Roboto-Bold", isRound ? 36 : 49);
 const fDate  = new render.Font("Gothic-Regular", 18);
 const fPhase = new render.Font("Gothic-Bold", 18);
 const fSm    = new render.Font("Gothic-Regular", 14);
